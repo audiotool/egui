@@ -16,7 +16,7 @@ use crate::{
 };
 
 // ----------------------------------------------------------------------------
-fn create_event_loop(native_options: &mut epi::NativeOptions) -> Result<EventLoop<UserEvent>> {
+pub fn create_event_loop(native_options: &mut epi::NativeOptions) -> Result<EventLoop<UserEvent>> {
     #[cfg(target_os = "android")]
     use winit::platform::android::EventLoopBuilderExtAndroid as _;
 
@@ -44,7 +44,7 @@ fn create_event_loop(native_options: &mut epi::NativeOptions) -> Result<EventLoo
 /// We reuse the event-loop so we can support closing and opening an eframe window
 /// multiple times. This is just a limitation of winit.
 #[cfg(not(target_os = "ios"))]
-fn with_event_loop<R>(
+pub fn with_event_loop<R>(
     mut native_options: epi::NativeOptions,
     f: impl FnOnce(&mut EventLoop<UserEvent>, epi::NativeOptions) -> R,
 ) -> Result<R> {
@@ -75,7 +75,7 @@ struct WinitAppWrapper<T: WinitApp> {
 
 impl<T: WinitApp> WinitAppWrapper<T> {
     fn new(winit_app: T, run_and_return: bool) -> Self {
-        Self {
+        Self {	    
             windows_next_repaint_times: HashMap::default(),
             winit_app,
             return_result: Ok(()),
