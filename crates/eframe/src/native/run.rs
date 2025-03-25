@@ -23,6 +23,15 @@ pub fn create_event_loop(native_options: &mut epi::NativeOptions) -> Result<Even
     profiling::function_scope!();
     let mut builder = winit::event_loop::EventLoop::with_user_event();
 
+    // disable DPI awareness on windows, as we're using this currently
+    // only for AT with Spitfire, and it doesn't react well to DPI
+    // scaling ...
+    #[cfg(target_os = "windows")]
+    {
+        use winit::platform::windows::EventLoopBuilderExtWindows;
+        builder.with_dpi_aware(false);
+    }
+
     #[cfg(target_os = "android")]
     let mut builder =
         builder.with_android_app(native_options.android_app.take().ok_or_else(|| {
@@ -75,7 +84,7 @@ struct WinitAppWrapper<T: WinitApp> {
 
 impl<T: WinitApp> WinitAppWrapper<T> {
     fn new(winit_app: T, run_and_return: bool) -> Self {
-        Self {	    
+        Self {
             windows_next_repaint_times: HashMap::default(),
             winit_app,
             return_result: Ok(()),
